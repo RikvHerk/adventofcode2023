@@ -29,14 +29,18 @@ for i in range(len(gmap)):
 s = 0
 for i in range(len(g)):
     for j in range(len(g)-1-i):
+        left = min(g[i][1], g[j+1+i][1])
+        right = max(g[i][1], g[j+1+i][1])
+        top = min(g[i][0], g[j+1+i][0])
+        bot = max(g[i][0], g[j+1+i][0])
         r = 0
         for row in rows:
-            if row > g[i][0] and row < g[j+1+i][0] or row > g[j+1+i][0] and row < g[i][0]:
+            if row > top and row < bot:
                 r += 999999
         c = 0
         for column in columns:
-            if column > g[i][1] and column < g[j+1+i][1] or column > g[j+1+i][1] and column < g[i][1]:
+            if column > left and column < right:
                 c += 999999
-        s += r + c + abs(g[i][0] - g[j+1+i][0]) + abs(g[i][1] - g[j+1+i][1])
+        s += r + c + right - left + bot - top
 
 print(s)
