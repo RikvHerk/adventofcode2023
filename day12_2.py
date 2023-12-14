@@ -47,8 +47,46 @@ for line in lines:
 
 
 s = 0
+normal = []
+extra = []
 t1 = perf_counter()
-for i in range(1):
-    s = solve(puzzle[i], instructions[i][:-2], 0, 0)
-    
-print(len(s), s, perf_counter()-t1)
+for i in [1]:#range(1):
+    for j in range(10):
+        s = solve(puzzle[i], instructions[i]+instructions[i][0:j], 0, 0)
+        if sum(s) == 0:
+            break
+        else:
+            normal.append(np.insert(s,0,j))
+for i in [1]:#range(1):
+    for n in normal:
+        if n[1] > 0:
+            for j in range(10):
+                if j == 0:
+                    s = solve([".", "?"] + puzzle[i][1:], instructions[i], 0, 0)
+                else:
+                    s = solve([".", "?"] + puzzle[i][1:], instructions[i][-j:]+instructions[i], 0, 0)
+                if sum(s) == 0:
+                    break
+                else:
+                    extra.append(np.insert(s,0,j))
+    for k in range(j-1):
+        s = solve(puzzle[i], instructions[i][0:-(k+1)], 0, 0)
+        if sum(s) == 0:
+            break
+        else:
+            normal.append(np.insert(s,0,-k-1))
+
+s = 0 
+for a in range(len(normal)):
+    z = normal[a][0]
+    for c in range(len(normal)):
+        if normal[c][0] + z == 0:        
+            s += normal[a][2]*np.sum(normal[c][1:])
+            break
+    for b in range(len(extra)):
+        if z + extra[b][0] == 0:
+            s += normal[a][1]*np.sum(extra[b][1:])
+            break
+
+
+print(s)
