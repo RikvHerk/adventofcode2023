@@ -15,8 +15,7 @@ def solve(puz, instr, ni, start):
     i = instr[ni]
     seg = ["."] + ["#"]*i + ["."]
     while start <= len(puz)-len(seg):
-        c = check(puz, seg, start)
-        if c:
+        if check(puz, seg, start):
             if "#" in puz[si:start]:
                 return s
             if ni == len(instr) - 1:
@@ -25,10 +24,8 @@ def solve(puz, instr, ni, start):
                 start += 1
                 continue
             else:
-                sol = solve(puz, instr, ni+1, start + i + 1)
+                s += solve(puz, instr, ni+1, start + i + 1)
                 start += 1 
-                if sol > 0:
-                    s += sol
         else:
             start += 1
     return s
@@ -44,9 +41,9 @@ for line in lines:
     puzzle.append(["."] + [i for i in x[0]] + ["."])
     instructions.append([int(i) for i in x[1].split(",")])
 
-s = []
+s = 0
 t1 = perf_counter()
 for i in range(len(puzzle)):
-    s.append(solve(puzzle[i], instructions[i], 0, 0))
+    s += solve(puzzle[i], instructions[i], 0, 0)
     
 print(s, perf_counter()-t1)
