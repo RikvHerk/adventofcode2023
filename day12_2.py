@@ -1,7 +1,7 @@
 from time import perf_counter
 import numpy as np
 
-def check(p, i, c): #puzzle input coordinate
+def check(p, i, c):
     seg = p[c:c+len(i)]
     for j in range(len(i)):
         if seg[j] == "?" or i[j] == seg[j]:
@@ -23,8 +23,8 @@ def solve(puz, instrp, ni, start):
                 else:
                     break
             if len(puz) - q <= last:
-                if not "." in puz[q+1:-1]:    
-                    s[len(puz) - q -1] += 1
+                if not "." in puz[q:-1]:    
+                    s[max(len(puz) - q, last)] += 1
             return s
         else:
             q = 0
@@ -85,7 +85,6 @@ def solve(puz, instrp, ni, start):
             start += 1
     return s
 
-
 with open("day12.txt", 'r') as inp:
     lines = inp.readlines()
 puzzle = []
@@ -96,7 +95,7 @@ for line in lines:
     puzzle.append(["."] + [i for i in x[0]] + ["."])
     instructions.append([int(i) for i in x[1].split(",")]*5 + [0])
 
-ss = []
+ss = 0
 t0 = perf_counter()
 for i in range(len(puzzle)):
     t1 = perf_counter()
@@ -114,7 +113,7 @@ for i in range(len(puzzle)):
             ninstr = instructions[i][int(c[0]):int(c[0])+j+1]
             for n, k in enumerate(c[1:]):
                 if k > 0:
-                    s = solve(["."] + ["?"]*n + puzzle[i][1:], ninstr, 0, 0)
+                    s = solve(["."] + puzzle[i][(-1 if n == 0 else -n):-1] + ["?"]*(0 if n == 0 else 1) + puzzle[i][1:], ninstr, 0, 0)
                     if sum(s) != 0:
                         c1.append(np.insert(k*s,0,j+int(c[0])))
     for c in c1:
@@ -122,7 +121,7 @@ for i in range(len(puzzle)):
             ninstr = instructions[i][int(c[0]):int(c[0])+j+1]
             for n, k in enumerate(c[1:]):
                 if k > 0:
-                    s = solve(["."] + ["?"]*n + puzzle[i][1:], ninstr, 0, 0)
+                    s = solve(["."] + puzzle[i][(-1 if n == 0 else -n):-1] + ["?"]*(0 if n == 0 else 1) + puzzle[i][1:], ninstr, 0, 0)
                     if sum(s) != 0:
                         c2.append(np.insert(k*s,0,j+int(c[0])))
     for c in c2:
@@ -130,22 +129,23 @@ for i in range(len(puzzle)):
             ninstr = instructions[i][int(c[0]):int(c[0])+j+1]
             for n, k in enumerate(c[1:]):
                 if k > 0:
-                    s = solve(["."] + ["?"]*n + puzzle[i][1:], ninstr, 0, 0)
+                    s = solve(["."] + puzzle[i][(-1 if n == 0 else -n):-1] + ["?"]*(0 if n == 0 else 1) + puzzle[i][1:], ninstr, 0, 0)
                     if sum(s) != 0:
                         c3.append(np.insert(k*s,0,j+int(c[0])))
     for c in c3:
-        for j in [len(instructions[i])-int(c[0])-1]:#range(len(instructions[i])-int(c[0])):
-            ninstr = instructions[i][int(c[0]):int(c[0])+j+2]
-            if not ninstr:
-                continue
-            for n, k in enumerate(c[1:]):
-                if k > 0:
-                    s = solve(["."] + puzzle[i][(-1 if n == 0 else -n):-1] + ["?"]*(0 if n == 0 else 1) + puzzle[i][1:], ninstr, 0, 0)
-                    if sum(s) != 0:
-                        c4.append(np.insert(k*s,0,j+int(c[0])+1))
+        j = len(instructions[i])-int(c[0])-1
+        ninstr = instructions[i][int(c[0]):int(c[0])+j+2]
+        if not ninstr:
+            continue
+        for n, k in enumerate(c[1:]):
+            if k > 0:
+                s = solve(["."] + puzzle[i][(-1 if n == 0 else -n):-1] + ["?"]*(0 if n == 0 else 1) + puzzle[i][1:], ninstr, 0, 0)
+                if sum(s) != 0:
+                    c4.append(np.insert(k*s,0,j+int(c[0])+1))
     s = 0                   
     for c in c4:
         s += sum(c[1:])
     ss += s
     print(i, s, perf_counter()-t1)
+
 print(ss, perf_counter()-t0)
